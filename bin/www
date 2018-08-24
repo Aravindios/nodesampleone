@@ -7,17 +7,20 @@ const Prometheus = require('prom-client')
 var app = require('../app');
 var debug = require('debug')('express-locallibrary-tutorial:server');
 var http = require('http');
-
+const express = require('express');
 /**
  * Get port from environment and store in Express.
  */
 
 var port = normalizePort(process.env.PORT || '6060');
 app.set('port', port);
-
+var app = express();
 /**
  * Create HTTP server.
  */
+
+app.use(express.static(publicPath));
+
 const metricsInterval = Prometheus.collectDefaultMetrics()
 const httpRequestDurationMicroseconds = new Prometheus.Histogram({
   name: 'http_request_duration_ms',
