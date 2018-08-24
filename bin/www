@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-
+const Prometheus = require('prom-client')
 var app = require('../app');
 var debug = require('debug')('express-locallibrary-tutorial:server');
 var http = require('http');
@@ -12,12 +12,26 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '6060');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
+const metricsInterval = Prometheus.collectDefaultMetrics()
+const httpRequestDurationMicroseconds = new Prometheus.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500]  // buckets for response time from 0.1ms to 500ms
+})
+
+
+// Metrics endpoint
+ app.get('/metrics', (req, res) => {
+  res.set('Content-Type', Prometheus.register.contentType)
+  res.end(Prometheus.register.metrics())
+})
 
 var server = http.createServer(app);
 
