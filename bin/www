@@ -19,7 +19,6 @@ var app = express();
  * Create HTTP server.
  */
 
-app.use(express.static(publicPath));
 
 const metricsInterval = Prometheus.collectDefaultMetrics()
 const httpRequestDurationMicroseconds = new Prometheus.Histogram({
